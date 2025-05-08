@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
+import { X, ChevronDown, ChevronRight, AlertTriangle, Database, Globe, LayoutDashboard, Menu, MessageSquare, Server } from "lucide-react";
+
 
 const SidebarItem = ({ label, icon: Icon, subItems }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +12,7 @@ const SidebarItem = ({ label, icon: Icon, subItems }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-2">
-          {/* <Icon size={20} /> */}
+          {Icon && <Icon className="mr-2 h-4 w-4" />}
           <span>{label}</span>
         </div>
         {subItems &&
@@ -33,13 +34,14 @@ const SidebarItem = ({ label, icon: Icon, subItems }) => {
   );
 };
 
+
 const CollapsibleMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="flex">
       <div
-        className={`fixed top-0 left-0 h-full bg-neutral-900 text-white w-64 transform ${
+        className={`fixed top-0 left-0 h-full bg-neutral-950 text-white w-64 transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out shadow-lg p-4`}
       >
@@ -47,36 +49,49 @@ const CollapsibleMenu = () => {
         <h2 className="text-lg font-bold">Moniflow</h2>
         <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 bg-gray-800 text-white rounded-md"
+            className="p-2 bg-blue-600 text-white rounded-md"
         >
             <X size={24} />
         </button>
         </div>
 
+
+        <SidebarItem label="Dashboard" icon={LayoutDashboard} />
+
         
-        <SidebarItem label="Dashboard" icon={Menu} />
+
         <SidebarItem
-          label="eCommerce"
-          icon={Menu}
+          label="Servidores"
+          icon={Server}
           subItems={["Orders", "Products", "Customers"]}
         />
         <SidebarItem
-          label="Projects"
-          icon={Menu}
+          label="Banco de Dados"
+          icon={Database}
           subItems={["Active", "Archived"]}
         />
         <SidebarItem
-          label="Online Courses"
-          icon={Menu}
+          label="APIs"
+          icon={Globe}
+          subItems={["My Courses", "Enrollments"]}
+        />
+        <SidebarItem
+          label="Alertas"
+          icon={AlertTriangle}
+          subItems={["My Courses", "Enrollments"]}
+        />
+        <SidebarItem
+          label="Logs"
+          icon={MessageSquare}
           subItems={["My Courses", "Enrollments"]}
         />
         
       </div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 m-4 bg-gray-800 text-white rounded-md"
+        className="m-[4px] p-2 px-3 bg-blue-600 text-white rounded-md"
       >
-        <Menu size={24}/>
+        <Menu size={20}/>
       </button>
     </div>
   );

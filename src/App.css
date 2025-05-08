@@ -1,11 +1,14 @@
-:root {
-  --custom-black: #1c1c1c00;
+button:hover {
+  /* background-color: #181818; */
+  /* transition: 0.5s all ease-out; */
+  outline: 1px solid aquamarine;
 }
 
-/* .collapsible-menu {
-  background-color: #1c1c1c00;
-} */
-
-.collapsible-menu {
-    background-color: #1c1c1c;
+input{
+  padding: 5px;
+}
+input:hover {
+  /* background-color: #181818; */
+  /* transition: 0.5s all ease-out; */
+  outline: 1px solid aquamarine;
 }
