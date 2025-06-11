@@ -7,7 +7,7 @@ import { TopMenu } from "./assets/components/TopMenu";
 // Páginas
 import { Dashboard } from "./assets/pages/Dashboard";
 import { Servidores } from "./assets/pages/Servidores";
-import { DBs } from "./assets/pages/dbs";
+import { DBs } from "./assets/pages/DBs";
 import { Endpoints } from "./assets/pages/Endpoints";
 import { Alertas } from "./assets/pages/Alertas";
 import { Logs } from "./assets/pages/Logs";
