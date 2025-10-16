@@ -18,21 +18,22 @@ export const Logs = () => {
   const logs = Array.from({ length: 10 }, (_, i) => {
     const tipo = tipos[i % tipos.length];
     const dropado = tipo === "REQUEST" || tipo === "ACCESS" ? i % 4 === 0 : false;
+    const timestamp = new Date();
+    // Definindo uma data fixa (hoje) com horas, minutos, segundos e milissegundos variáveis
+    timestamp.setHours(12, i % 60, i % 60, i * 100 % 1000);
 
     return {
       id: i + 1,
-      nome: `Log ${i + 1}`,
       tipo,
       descricao: `Evento do tipo ${tipo.toLowerCase()} detectado.`,
-      data: `2025-06-10 12:${(i % 60).toString().padStart(2, "0")}`,
-      origem: tipo === "ACCESS" || tipo === "REQUEST" ? `192.168.${i % 255}.${i % 200}` : "-",
-      destino: tipo === "ACCESS" || tipo === "REQUEST" ? `10.0.0.${(i * 2) % 255}` : "-",
+      timestamp: timestamp.toISOString(),
+      sistemaOrigem: tipo === "ACCESS" || tipo === "REQUEST" ? `Sistema ${i % 3 + 1}` : "Sistema Principal",
       dropado
     };
   });
 
   const filtrados = logs.filter((log) => {
-    const correspondeBusca = [log.nome, log.tipo, log.descricao]
+    const correspondeBusca = [log.tipo, log.descricao, log.sistemaOrigem]
       .join(" ")
       .toLowerCase()
       .includes(busca.toLowerCase());

@@ -74,41 +74,47 @@ export const LogsTable = ({ logs, onDetalhar, onMarcar, marcados }) => {
         </div>
       </div>
 
-      <table className="w-full text-sm">
-        <thead className="text-left text-black dark:text-white border-b dark:border-neutral-700">
-          <tr>
-            <th className="py-2 px-2">ID</th>
-            <th className="py-2 px-2">Nome</th>
-            <th className="py-2 px-2">Tipo</th>
-            <th className="py-2 px-2">Descrição</th>
-            <th className="py-2 px-2">Origem</th>
-            <th className="py-2 px-2">Destino</th>
-            <th className="py-2 px-2">Dropado</th>
-            <th className="py-2 px-2">Data</th>
-            <th className="py-2 px-2">Ações</th>
+      <table className="w-full text-sm border-collapse">
+        <thead className="text-left text-black dark:text-white">
+          <tr className="border-b border-r-0 border-l-0 border-t-0 border-neutral-200 dark:border-neutral-700">
+            <th className="py-2 px-2 w-32 border-r border-neutral-200 dark:border-neutral-700">Tipo</th>
+            <th className="py-2 px-2 w-48 border-r border-neutral-200 dark:border-neutral-700">Timestamp</th>
+            <th className="py-2 px-2 border-r border-neutral-200 dark:border-neutral-700">Descrição</th>
+            <th className="py-2 px-2 w-48 border-r border-neutral-200 dark:border-neutral-700">Sistema de Origem</th>
+            <th className="py-2 px-2 w-24 text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
           {logsFiltrados.map((log) => (
             <tr
               key={log.id}
-              className={`text-black dark:text-white border-b dark:border-neutral-700 ${
+              className={`text-black dark:text-white border-b border-neutral-200 dark:border-neutral-700 ${
                 marcados.includes(log.id) ? "bg-yellow-50 dark:bg-yellow-900/10" : ""
               }`}
             >
-              <td className="py-2 px-2">{log.id}</td>
-              <td className="py-2 px-2">{log.nome}</td>
-              <td className="py-2 px-2">
-                <span className={`text-xs font-medium rounded-full px-2 py-0.5 ${tipoCores[log.tipo]}`}>
+              <td className="py-2 px-2 w-32 border-r border-neutral-200 dark:border-neutral-700">
+                <span className={`text-xs font-medium rounded-full px-2 py-0.5 ${tipoCores[log.tipo]} whitespace-nowrap inline-block`}>
                   {log.tipo}
                 </span>
               </td>
-              <td className="py-2 px-2">{log.descricao}</td>
-              <td className="py-2 px-2">{log.origem || "-"}</td>
-              <td className="py-2 px-2">{log.destino || "-"}</td>
-              <td className="py-2 px-2">{log.dropado ? "Sim" : "Não"}</td>
-              <td className="py-2 px-2">{log.data}</td>
-              <td className="py-2 px-2 flex gap-2">
+              <td className="py-2 px-2 w-48 whitespace-nowrap text-sm border-r border-neutral-200 dark:border-neutral-700">
+                {new Date(log.timestamp).toLocaleString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                })}
+                <span className="text-xs opacity-70">
+                  .{new Date(log.timestamp).getMilliseconds().toString().padStart(3, '0')}
+                </span>
+              </td>
+              <td className="py-2 px-2 text-sm border-r border-neutral-200 dark:border-neutral-700">{log.descricao}</td>
+              <td className="py-2 px-2 w-48 text-sm border-r border-neutral-200 dark:border-neutral-700">{log.sistemaOrigem}</td>
+              <td className="py-2 px-2 w-24">
+                <div className="flex justify-center gap-2">
                 <button
                   title="Ver detalhes"
                   onClick={() => onDetalhar(log)}
@@ -131,6 +137,7 @@ export const LogsTable = ({ logs, onDetalhar, onMarcar, marcados }) => {
                     }`}
                   />
                 </button>
+                </div>
               </td>
             </tr>
           ))}
