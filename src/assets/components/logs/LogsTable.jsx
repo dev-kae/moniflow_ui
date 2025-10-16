@@ -1,78 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Eye, Flag } from "lucide-react";
-import { tipoCores, dropadoCores } from "./tagStyles";
+import { tipoCores } from "./tagStyles";
 
 export const LogsTable = ({ logs, onDetalhar, onMarcar, marcados }) => {
-  const tiposDisponiveis = [...new Set(logs.map((log) => log.tipo))];
-  const [tiposSelecionados, setTiposSelecionados] = useState([]);
-  const [dropadoSelecionado, setDropadoSelecionado] = useState({ sim: false, nao: false });
-
-  const logsFiltrados = logs.filter((log) => {
-    const tipoOk =
-      tiposSelecionados.length === 0 || tiposSelecionados.includes(log.tipo);
-    const dropadoOk =
-      (!dropadoSelecionado.sim && !dropadoSelecionado.nao) ||
-      (dropadoSelecionado.sim && log.dropado) ||
-      (dropadoSelecionado.nao && !log.dropado);
-    return tipoOk && dropadoOk;
-  });
-
-  const toggleTipo = (tipo) => {
-    setTiposSelecionados((prev) =>
-      prev.includes(tipo)
-        ? prev.filter((t) => t !== tipo)
-        : [...prev, tipo]
-    );
-  };
-
-  const toggleDropado = (valor) => {
-    setDropadoSelecionado((prev) => ({ ...prev, [valor]: !prev[valor] }));
-  };
 
   return (
     <div className="overflow-x-auto">
-      <div className="mb-6 flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-black dark:text-white">Tipo:</span>
-          <div className="flex flex-wrap gap-2">
-            {tiposDisponiveis.map((tipo) => {
-              const ativo = tiposSelecionados.includes(tipo);
-              return (
-                <span
-                  key={tipo}
-                  onClick={() => toggleTipo(tipo)}
-                  className={`cursor-pointer text-xs px-3 py-1 rounded-full select-none border border-transparent font-medium transition-colors duration-200 ${
-                    ativo ? tipoCores[tipo] : "bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300"
-                  }`}
-                >
-                  {tipo}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-black dark:text-white">Dropado:</span>
-          <div className="flex flex-wrap gap-2">
-            {['sim', 'nao'].map((opcao) => {
-              const ativo = dropadoSelecionado[opcao];
-              const cor = dropadoCores[opcao];
-              return (
-                <span
-                  key={opcao}
-                  onClick={() => toggleDropado(opcao)}
-                  className={`cursor-pointer text-xs px-3 py-1 rounded-full select-none border border-transparent font-medium transition-colors duration-200 ${
-                    ativo ? cor : 'bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'
-                  }`}
-                >
-                  {opcao.charAt(0).toUpperCase() + opcao.slice(1)}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       <table className="w-full text-sm border-collapse">
         <thead className="text-left text-black dark:text-white">
@@ -85,7 +18,7 @@ export const LogsTable = ({ logs, onDetalhar, onMarcar, marcados }) => {
           </tr>
         </thead>
         <tbody>
-          {logsFiltrados.map((log) => (
+          {logs.map((log) => (
             <tr
               key={log.id}
               className={`text-black dark:text-white border-b border-neutral-200 dark:border-neutral-700 ${

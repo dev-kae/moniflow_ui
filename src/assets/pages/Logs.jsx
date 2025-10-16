@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useSidebar } from "../../context/SidebarContext";
-import { FileText, Flag } from "lucide-react";
+import { FileText, Flag, Filter, X } from "lucide-react";
 import { LogsTable } from "../components/logs/LogsTable";
 import { LogDetailModal } from "../components/logs/LogDetailModal";
-import { tipoCores, dropadoCores } from "../components/logs/tagStyles";
+import { tipoCores } from "../components/logs/tagStyles";
 
 export const Logs = () => {
   const { collapsed } = useSidebar();
@@ -12,6 +12,11 @@ export const Logs = () => {
   const [marcados, setMarcados] = useState([]);
   const [filtroMarcadosAtivo, setFiltroMarcadosAtivo] = useState(false);
   const [logSelecionado, setLogSelecionado] = useState(null);
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [filtros, setFiltros] = useState({
+    tipos: [],
+    dropado: { sim: false, nao: false }
+  });
 
   const tipos = Object.keys(tipoCores);
 
@@ -33,15 +38,58 @@ export const Logs = () => {
   });
 
   const filtrados = logs.filter((log) => {
+    // Filtro de busca
     const correspondeBusca = [log.tipo, log.descricao, log.sistemaOrigem]
       .join(" ")
       .toLowerCase()
       .includes(busca.toLowerCase());
+      
+    // Filtro de marcados
     const correspondeMarcado = !filtroMarcadosAtivo || marcados.includes(log.id);
-    return correspondeBusca && correspondeMarcado;
+    
+    // Filtro de tipos
+    const tipoOk = filtros.tipos.length === 0 || filtros.tipos.includes(log.tipo);
+    
+    // Filtro de dropado
+    const dropadoOk = 
+      (!filtros.dropado.sim && !filtros.dropado.nao) ||
+      (filtros.dropado.sim && log.dropado) ||
+      (filtros.dropado.nao && !log.dropado);
+    
+    return correspondeBusca && correspondeMarcado && tipoOk && dropadoOk;
   });
 
   const exibidos = filtrados;
+  
+  const toggleTipo = (tipo) => {
+    setFiltros(prev => ({
+      ...prev,
+      tipos: prev.tipos.includes(tipo)
+        ? prev.tipos.filter(t => t !== tipo)
+        : [...prev.tipos, tipo]
+    }));
+  };
+  
+  const toggleDropado = (valor) => {
+    setFiltros(prev => ({
+      ...prev,
+      dropado: {
+        ...prev.dropado,
+        [valor]: !prev.dropado[valor]
+      }
+    }));
+  };
+  
+  const limparFiltros = () => {
+    setFiltros({
+      tipos: [],
+      dropado: { sim: false, nao: false }
+    });
+  };
+  
+  const temFiltrosAtivos = filtros.tipos.length > 0 || 
+                         filtros.dropado.sim || 
+                         filtros.dropado.nao;
 
   const alternarMarcacao = (id) => {
     setMarcados((prev) =>
@@ -61,25 +109,106 @@ export const Logs = () => {
       </p>
 
       <div className="flex flex-wrap justify-between items-start gap-3 mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por nome, tipo, etc."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          className="px-3 py-2 border border-border rounded-md text-sm bg-popover text-popover-foreground dark:text-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ring w-full md:w-1/2"
-        />
-
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 w-full md:w-3/4">
+          <input
+            type="text"
+            placeholder="Buscar por tipo, descrição ou origem..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="flex-1 px-3 py-2 border border-border rounded-md text-sm bg-popover text-popover-foreground dark:text-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          
+          <div className="relative">
+            <button
+              onClick={() => setMostrarFiltros(!mostrarFiltros)}
+              className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                temFiltrosAtivos 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                  : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filtros
+              {temFiltrosAtivos && (
+                <span className="ml-1 w-2 h-2 rounded-full bg-blue-500"></span>
+              )}
+            </button>
+            
+            {mostrarFiltros && (
+              <div className="absolute right-0 mt-1 w-64 bg-white dark:bg-neutral-800 rounded-md shadow-lg border border-neutral-200 dark:border-neutral-700 z-10 p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium">Filtros</h3>
+                  <button 
+                    onClick={() => setMostrarFiltros(false)}
+                    className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Tipo</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {tipos.map((tipo) => (
+                        <button
+                          key={tipo}
+                          onClick={() => toggleTipo(tipo)}
+                          className={`text-xs px-2 py-1 rounded-full border ${
+                            filtros.tipos.includes(tipo)
+                              ? tipoCores[tipo]
+                              : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border-transparent'
+                          }`}
+                        >
+                          {tipo}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Status</h4>
+                    <div className="flex gap-3">
+                      {['sim', 'nao'].map((opcao) => (
+                        <label key={opcao} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={filtros.dropado[opcao]}
+                            onChange={() => toggleDropado(opcao)}
+                            className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700"
+                          />
+                          <span>Dropado {opcao === 'sim' ? 'sim' : 'não'}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={limparFiltros}
+                    disabled={!temFiltrosAtivos}
+                    className={`w-full py-2 text-sm rounded-md ${
+                      temFiltrosAtivos
+                        ? 'text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
+                        : 'text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
+                    }`}
+                  >
+                    Limpar filtros
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
           <button
             onClick={() => setFiltroMarcadosAtivo((prev) => !prev)}
             title="Exibir apenas logs marcados"
-            className="cursor-pointer"
+            className={`px-3 py-2 rounded-md text-sm font-medium ${
+              filtroMarcadosAtivo
+                ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300'
+                : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+            }`}
           >
-            <Flag
-              className={`w-5 h-5 transition-colors ${
-                filtroMarcadosAtivo ? "fill-[#FA565F] text-[#FA565F]" : "text-neutral-500"
-              }`}
-            />
+            <Flag className={`w-4 h-4 ${filtroMarcadosAtivo ? 'fill-current' : ''}`} />
           </button>
 
         </div>
@@ -91,7 +220,6 @@ export const Logs = () => {
         onMarcar={alternarMarcacao}
         marcados={marcados}
         tipoCores={tipoCores}
-        dropadoCores={dropadoCores}
       />
 
 
