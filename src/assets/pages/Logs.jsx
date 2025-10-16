@@ -8,8 +8,6 @@ import { tipoCores, dropadoCores } from "../components/logs/tagStyles";
 export const Logs = () => {
   const { collapsed } = useSidebar();
 
-  const [itensPorPagina, setItensPorPagina] = useState(10);
-  const [paginaAtual, setPaginaAtual] = useState(1);
   const [busca, setBusca] = useState("");
   const [marcados, setMarcados] = useState([]);
   const [filtroMarcadosAtivo, setFiltroMarcadosAtivo] = useState(false);
@@ -17,7 +15,7 @@ export const Logs = () => {
 
   const tipos = Object.keys(tipoCores);
 
-  const logs = Array.from({ length: 143 }, (_, i) => {
+  const logs = Array.from({ length: 10 }, (_, i) => {
     const tipo = tipos[i % tipos.length];
     const dropado = tipo === "REQUEST" || tipo === "ACCESS" ? i % 4 === 0 : false;
 
@@ -42,11 +40,7 @@ export const Logs = () => {
     return correspondeBusca && correspondeMarcado;
   });
 
-  const totalPaginas = Math.ceil(filtrados.length / itensPorPagina);
-  const exibidos = filtrados.slice(
-    (paginaAtual - 1) * itensPorPagina,
-    paginaAtual * itensPorPagina
-  );
+  const exibidos = filtrados;
 
   const alternarMarcacao = (id) => {
     setMarcados((prev) =>
@@ -87,18 +81,6 @@ export const Logs = () => {
             />
           </button>
 
-          <select
-            value={itensPorPagina}
-            onChange={(e) => {
-              setItensPorPagina(Number(e.target.value));
-              setPaginaAtual(1);
-            }}
-            className="px-3 py-2 border border-border rounded-md text-sm bg-popover text-popover-foreground dark:text-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {[10, 25, 50, 100].map((n) => (
-              <option key={n} value={n}>{n} por página</option>
-            ))}
-          </select>
         </div>
       </div>
 
@@ -111,21 +93,6 @@ export const Logs = () => {
         dropadoCores={dropadoCores}
       />
 
-      <div className="flex justify-center gap-2 mt-6 flex-wrap">
-        {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((n) => (
-          <button
-            key={n}
-            onClick={() => setPaginaAtual(n)}
-            className={`px-3 py-1 rounded-md text-sm font-medium border border-border hover:bg-neutral-200 dark:hover:bg-neutral-700 cursor-pointer ${
-              n === paginaAtual
-                ? "bg-gradient-to-r from-[#FA565F] to-[#9352F4] text-white"
-                : "bg-white dark:bg-neutral-800 text-black dark:text-white"
-            }`}
-          >
-            {n}
-          </button>
-        ))}
-      </div>
 
       <LogDetailModal log={logSelecionado} onClose={() => setLogSelecionado(null)} />
     </div>
